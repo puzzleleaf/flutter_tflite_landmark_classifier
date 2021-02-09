@@ -9,7 +9,7 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   startTime() async {
-    var _duration = new Duration(seconds: 4);
+    var _duration = new Duration(seconds: 1);
     return new Timer(_duration, navigationPage);
   }
 
@@ -26,7 +26,7 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    // startTime();
+    startTime();
   }
 
   @override
@@ -58,7 +58,7 @@ class _SplashPageState extends State<SplashPage> {
               'LANDMARK\nCLASSIFIER',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 45,
+                fontSize: 30,
                 fontWeight: FontWeight.bold,
                 shadows: [
                   Shadow(

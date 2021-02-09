@@ -11,7 +11,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Landmark Classifier',
-      home: SplashPage(),
+      theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          elevation: 0.0,
+          color: Colors.transparent,
+        )
+      ),
+      home: HomePage(),
     );
   }
 }
