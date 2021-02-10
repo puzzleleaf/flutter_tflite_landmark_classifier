@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:landmark_classifier/constants/data.dart';
+import 'package:landmark_classifier/models/landmark.dart';
 import 'package:landmark_classifier/pages/classification_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -66,8 +67,7 @@ class _HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ClassificationPage(
-                            title: items[index]['title'],
-                            image: items[index]['image'],
+                            landmark: Landmark.fromJson(items[index]),
                           ),
                         ),
                       );

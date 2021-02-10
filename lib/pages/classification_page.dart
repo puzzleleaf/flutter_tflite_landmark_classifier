@@ -1,14 +1,14 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:landmark_classifier/models/landmark.dart';
 import 'package:landmark_classifier/services/classification_service.dart';
 import 'package:landmark_classifier/services/image_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ClassificationPage extends StatefulWidget {
-  final String title;
-  final String image;
+  final Landmark landmark;
 
-  const ClassificationPage({Key key, this.title, this.image}) : super(key: key);
+  const ClassificationPage({Key key, this.landmark}) : super(key: key);
 
   @override
   _ClassificationPageState createState() => _ClassificationPageState();
@@ -24,9 +24,8 @@ class _ClassificationPageState extends State<ClassificationPage> {
   void initState() {
     super.initState();
     _classificationService = ClassificationService(
-      modelPath: 'models/landmarks_classifier_asia.tflite',
-      labelPath: 'labels/landmarks_classifier_asia.txt',
-      labelLength: 64302,
+      modelPath: 'models/landmarks_classifier_africa.tflite',
+      labelPath: 'labels/landmarks_classifier_africa.txt',
     );
     _imageService = ImageService();
   }
@@ -38,7 +37,7 @@ class _ClassificationPageState extends State<ClassificationPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.black.withOpacity(0.2),
-        title: Text(widget.title),
+        title: Text(widget.landmark.title),
       ),
       body: Stack(
         children: [
@@ -49,7 +48,7 @@ class _ClassificationPageState extends State<ClassificationPage> {
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: userImage == null
-                    ? AssetImage(widget.image)
+                    ? AssetImage(widget.landmark.image)
                     : MemoryImage(userImage),
                 fit: BoxFit.cover,
               ),
@@ -63,6 +62,7 @@ class _ClassificationPageState extends State<ClassificationPage> {
             padding: const EdgeInsets.only(
               top: 80,
               left: 20,
+              right: 20,
             ),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -71,45 +71,60 @@ class _ClassificationPageState extends State<ClassificationPage> {
                 topRight: Radius.circular(15),
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'What is this landmark?',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'What is this landmark?',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                userImage == null
-                    ? Text(
-                        'No image selected.',
-                        style: TextStyle(
-                          color: Colors.grey,
-                        ),
-                      )
-                    : Container(),
-                Container(
-                  height: 200,
-                  child: ListView.builder(
-                    itemCount: result.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          _launchURL(result[index]['label']);
-                        },
-                        child: Container(
-                          height: 20,
-                          child: Text('${result[index]}'),
-                        ),
-                      );
-                    },
+                  SizedBox(
+                    height: 10,
                   ),
-                ),
-              ],
+                  userImage == null
+                      ? Text(
+                          'No image selected.',
+                          style: TextStyle(
+                            color: Colors.grey,
+                          ),
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (var i = 0; i < result.length; i++)
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text('${i + 1}. ${result[i]['label']}'),
+                                      Text(
+                                        '${result[i]['value']}',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  RaisedButton(
+                                    onPressed: () {
+                                      _launchURL(result[i]['label']);
+                                    },
+                                    child: Text('Search'),
+                                  )
+                                ],
+                              ),
+                          ],
+                        ),
+                ],
+              ),
             ),
           ),
 
@@ -125,7 +140,7 @@ class _ClassificationPageState extends State<ClassificationPage> {
                   child: RawMaterialButton(
                     onPressed: () async {
                       var imageData = await _imageService.cameraImage();
-                      var test = await _classificationService.runClassification(
+                      var test = _classificationService.runClassification(
                         imageData: imageData,
                         resultCount: 10,
                       );
@@ -186,7 +201,7 @@ class _ClassificationPageState extends State<ClassificationPage> {
     );
   }
 
-  _launchURL(String landmark) async {
+  void _launchURL(String landmark) async {
     var url = 'https://google.com/search?q=$landmark';
     if (await canLaunch(url)) {
       await launch(url);
