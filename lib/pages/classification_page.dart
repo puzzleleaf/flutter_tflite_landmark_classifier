@@ -24,10 +24,16 @@ class _ClassificationPageState extends State<ClassificationPage> {
   void initState() {
     super.initState();
     _classificationService = ClassificationService(
-      modelPath: 'models/landmarks_classifier_africa.tflite',
-      labelPath: 'labels/landmarks_classifier_africa.txt',
+      modelPath: widget.landmark.model,
+      labelPath: widget.landmark.label,
     );
     _imageService = ImageService();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _classificationService.dispose();
   }
 
   @override
@@ -100,18 +106,20 @@ class _ClassificationPageState extends State<ClassificationPage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text('${i + 1}. ${result[i]['label']}'),
-                                      Text(
-                                        '${result[i]['value']}',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text('${i + 1}. ${result[i]['label']}'),
+                                        Text(
+                                          '${result[i]['value']}',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                   RaisedButton(
                                     onPressed: () {
@@ -131,69 +139,31 @@ class _ClassificationPageState extends State<ClassificationPage> {
           // Camera, Gallery Button
           Container(
             margin: const EdgeInsets.only(top: 310),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  child: RawMaterialButton(
-                    onPressed: () async {
-                      var imageData = await _imageService.cameraImage();
-                      var test = _classificationService.runClassification(
-                        imageData: imageData,
-                        resultCount: 10,
-                      );
-                      setState(() {
-                        userImage = imageData;
-                        result = test;
-                      });
-                    },
-                    elevation: 4.0,
-                    fillColor: Colors.white,
-                    child: Icon(
-                      Icons.camera,
-                      size: 35.0,
-                      color: Colors.grey,
-                    ),
-                    padding: EdgeInsets.all(15.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
+            alignment: Alignment.topCenter,
+            child: Container(
+              width: 80,
+              height: 80,
+              child: RawMaterialButton(
+                onPressed: () async {
+                  var imageData = await _imageService.loadImage();
+                  var classification = classify(imageData);
+                  setState(() {
+                    userImage = imageData;
+                    result = classification;
+                  });
+                },
+                elevation: 4.0,
+                fillColor: Colors.white,
+                child: Icon(
+                  Icons.camera,
+                  size: 35.0,
+                  color: Colors.grey,
                 ),
-                SizedBox(
-                  width: 30,
+                padding: EdgeInsets.all(15.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
                 ),
-                Container(
-                  width: 80,
-                  height: 80,
-                  child: RawMaterialButton(
-                    onPressed: () async {
-                      var imageData = await _imageService.loadImage();
-                      var test = await _classificationService.runClassification(
-                        imageData: imageData,
-                        resultCount: 10,
-                      );
-                      setState(() {
-                        userImage = imageData;
-                        result = test;
-                      });
-                    },
-                    elevation: 4.0,
-                    fillColor: Colors.white,
-                    child: Icon(
-                      Icons.image_outlined,
-                      size: 35.0,
-                      color: Colors.grey,
-                    ),
-                    padding: EdgeInsets.all(15.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ],
@@ -201,8 +171,20 @@ class _ClassificationPageState extends State<ClassificationPage> {
     );
   }
 
+  List<dynamic> classify(imageData) {
+    if (imageData == null) {
+      return [];
+    } else {
+      return _classificationService.runClassification(
+        imageData: imageData,
+        resultCount: 10,
+      );
+    }
+  }
+
   void _launchURL(String landmark) async {
-    var url = 'https://google.com/search?q=$landmark';
+    var url = 'https://google.com/search?q=${landmark.replaceAll(' ', '_')}';
+    url = Uri.encodeFull(url);
     if (await canLaunch(url)) {
       await launch(url);
     } else {

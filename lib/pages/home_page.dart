@@ -85,6 +85,7 @@ class _HomePageState extends State<HomePage> {
                         vertical: 30 - 30 * scale,
                       ),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Container(
