@@ -12,7 +12,7 @@ To be used in real-world projects, you need to improve the performance of your m
 </p>
 
 ## Youtube
-[Flutter Landmark Classifier (TFLite) - SpeedCode](https://youtu.be/kxh9BHfkD2A)
+[Flutter Landmark Classifier (TFLite) - SpeedCode](https://youtu.be/1fKNNDLd-Oo)
 <p align="center">
  <img src="readme/youtube.png" width='1024'/>
 </p>
@@ -46,4 +46,4 @@ If you are in an iOS environment, you must add the following in Podfile
 * url_launcher : https://pub.dev/packages/url_launcher
 
 ## Keyword
-Classification, Landmark, Flask, Heroku, Flutter, Tensorflow
+Classification, Landmark, Flutter, Tensorflow, TFLite
