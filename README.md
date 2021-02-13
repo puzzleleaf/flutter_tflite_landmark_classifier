@@ -24,6 +24,9 @@ To be used in real-world projects, you need to improve the performance of your m
 To use the tflite model, follow the guide on the page below.    
 - https://pub.dev/packages/tflite_flutter#important-initial-setup
 
+If you are in an iOS environment, you must add the following in Podfile
+- https://github.com/PuzzleLeaf/flutter_tflite_landmark_classifier/blob/master/ios/Podfile#L31
+
 ## TFHub Landmark Models
 - https://tfhub.dev/google/on_device_vision/classifier/landmarks_classifier_asia_V1/1
 - https://tfhub.dev/google/on_device_vision/classifier/landmarks_classifier_south_america_V1/1
